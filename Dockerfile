@@ -35,7 +35,7 @@ RUN cmake --build . -j
 
 FROM build AS test
 
-RUN ./vcpkg-libsodium-avx512
+RUN ./vcpkg-libsodium-avx512 1024000 100
 
 FROM base AS final
 
