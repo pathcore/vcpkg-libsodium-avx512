@@ -1,0 +1,8 @@
+.vscode/
+
+build/
+
+vcpkg/buildtrees/
+vcpkg/downloads/
+vcpkg/installed/
+vcpkg/packages/
