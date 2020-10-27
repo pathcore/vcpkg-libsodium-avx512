@@ -3,29 +3,54 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <string>
 
-constexpr std::size_t CHUNK_SIZE = 512;
-constexpr std::size_t NUM_CHUNKS = 20;
-constexpr std::size_t BUFFER_SIZE = CHUNK_SIZE * NUM_CHUNKS;
+namespace {
 
-int main() {
+void print_usage(std::ostream &out) {
+  out << "usage: vcpkg-libsodium-avx512 CHUNK_SIZE NUM_CHUNKS" << std::endl;
+}
+
+}  // namespace
+
+
+int main(int argc, char *argv[]) {
+  if (argc != 3) {
+    print_usage(std::cout);
+    return EXIT_FAILURE;
+  }
+
+  std::size_t chunk_size = 0;
+  std::size_t num_chunks = 0;
+
+  try {
+    chunk_size = std::stoull(argv[1]);
+    num_chunks = std::stoull(argv[2]);
+  } catch (...) {
+    std::cout << "failed to parse args\n";
+    print_usage(std::cout);
+    return EXIT_FAILURE;
+  }
+  
+  auto const buffer_size = chunk_size * num_chunks;
+
   std::cout << "initializing libsodium" << std::endl;
   if (sodium_init() != 0) {
-    std::cerr << "initialization failed!" << std::endl;
+    std::cout << "initialization failed!" << std::endl;
     return EXIT_FAILURE;
   }
   
   std::cout << "generating some random data" << std::endl;
-  auto buffer = std::make_unique<unsigned char[]>(BUFFER_SIZE);
-  randombytes_buf(static_cast<void * const>(buffer.get()), BUFFER_SIZE);
+  auto buffer = std::make_unique<unsigned char[]>(buffer_size);
+  randombytes_buf(static_cast<void * const>(buffer.get()), buffer_size);
 
   std::cout << "initializing hash state" << std::endl;
   crypto_generichash_blake2b_state state;
   crypto_generichash_blake2b_init(&state, nullptr, 0, crypto_generichash_BYTES);
 
-  for (auto i = 0; i < NUM_CHUNKS; ++i) {
+  for (auto i = 0; i < num_chunks; ++i) {
     std::cout << "computing hash, chunk: " << i << std::endl;
-    crypto_generichash_update(&state, buffer.get() + i * CHUNK_SIZE, CHUNK_SIZE);
+    crypto_generichash_update(&state, buffer.get() + i * chunk_size, chunk_size);
   }
 
   std::cout << "finalizing hash" << std::endl;

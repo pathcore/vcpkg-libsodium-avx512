@@ -43,3 +43,4 @@ COPY --from=test /usr/src/vcpkg-libsodium-avx512/build/vcpkg-libsodium-avx512 /o
 WORKDIR /opt/bin
 
 ENTRYPOINT ["/opt/bin/vcpkg-libsodium-avx512"]
+CMD [ "1024000", "100" ]
