@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
   cmake \
   curl \
   g++ \
+  git \
   ninja-build \
   tar \
   unzip \
