@@ -1,5 +1,6 @@
 #include <sodium.h>
 
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 
@@ -9,7 +10,10 @@ constexpr std::size_t BUFFER_SIZE = CHUNK_SIZE * NUM_CHUNKS;
 
 int main() {
   std::cout << "initializing libsodium" << std::endl;
-  sodium_init();
+  if (sodium_init() != 0) {
+    std::cerr << "initialization failed!" << std::endl;
+    return EXIT_FAILURE;
+  }
   
   std::cout << "generating some random data" << std::endl;
   auto buffer = std::make_unique<unsigned char[]>(BUFFER_SIZE);
@@ -34,4 +38,6 @@ int main() {
   sodium_bin2hex(output_str.get(), str_len, output_bytes.get(), crypto_generichash_BYTES);
 
   std::cout << "computed hash: " << output_str.get() << std::endl;
+
+  return EXIT_SUCCESS;
 }
